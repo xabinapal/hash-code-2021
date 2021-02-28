@@ -1,3 +1,4 @@
+import json
 import math
 
 
@@ -16,6 +17,14 @@ class Scheduler:
             for street, duration in schedule:
                 print(street.name, duration)
 
+    def serialize(self):
+        return json.dumps(self._intersections)
+
+    @classmethod
+    def deserialize(cls, data):
+        scheduler = cls()
+        scheduler._intersections = json.loads(data)
+
 
 class DummyScheduler(Scheduler):
     def __init__(self, city):
@@ -25,7 +34,7 @@ class DummyScheduler(Scheduler):
             schedule = []
             for entrance in intersection.entrances.values():
                 time = 1
-                schedule.append((entrance, time))
+                schedule.append((entrance.id, time))
 
             self._intersections[intersection.id] = tuple(schedule)
 
@@ -43,8 +52,8 @@ class CongestionScheduler(Scheduler):
                 time = math.ceil(
                     len(intersection.entrances) * (entrance.total_cars / total_cars) / factor
                 )
-                schedule.append((entrance, time))
+                schedule.append((entrance.id, time))
 
             self._intersections[intersection.id] = tuple(
-                sorted(schedule, key=lambda x: x[0].starting_cars, reverse=True)
+                sorted(schedule, key=lambda x: intersection.entrances[x[0]].starting_cars, reverse=True)
             )

@@ -65,18 +65,18 @@ class SimulationIntersection:
         if self.current_light_time == -1:
             self.current_light = 0
             self.current_light_time = 0
-            self.traffic_lights[self.schedule[self.current_light][0].id].set_open(True)
+            self.traffic_lights[self.schedule[self.current_light][0]].set_open(True)
         elif len(self.schedule) > 1:
             self.current_light_time += 1
             if self.current_light_time == self.schedule[self.current_light][1]:
-                self.traffic_lights[self.schedule[self.current_light][0].id].set_open(
+                self.traffic_lights[self.schedule[self.current_light][0]].set_open(
                     False
                 )
 
                 self.current_light = (self.current_light + 1) % len(self.traffic_lights)
                 self.current_light_time = 0
 
-                self.traffic_lights[self.schedule[self.current_light][0].id].set_open(
+                self.traffic_lights[self.schedule[self.current_light][0]].set_open(
                     True
                 )
 
