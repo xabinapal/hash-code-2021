@@ -1,3 +1,4 @@
+import argparse
 import os
 import logging
 import sys
@@ -6,6 +7,13 @@ from hash_code_2021 import City, DummyScheduler, Simulator
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "WARN").upper()
 logging.basicConfig(level=LOG_LEVEL)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("action", type=str, choices=["submit", "simulate"])
+parser.add_argument("--optimize", action=argparse.BooleanOptionalAction)
+parser.add_argument("--scheduler", type=str, choices=["dummy"])
+
+arguments = parser.parse_args()
 
 # Read input
 duration, num_intersections, num_streets, num_cars, bonus_score = (
@@ -19,13 +27,16 @@ for _ in range(num_streets):
 for _ in range(num_cars):
     city.add_car(input())
 
-city.simplify()
+if arguments.optimize:
+    city.simplify()
 
-scheduler = DummyScheduler(city)
+scheduler = None
+if arguments.scheduler == "dummy":
+    scheduler = DummyScheduler(city)
 
-if sys.argv[1] == "submit":
+if arguments.action == "submit":
     scheduler.print()
-elif sys.argv[1] == "simulate":
+elif arguments.action == "simulate":
     simulator = Simulator(city, duration, bonus_score)
     simulator.prepare()
     score = simulator.execute(scheduler)

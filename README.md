@@ -4,7 +4,12 @@
 
 ### Dummy solution
 
-Initial simple version with a one-second-cycle every streets.
+Initial simple version with a one-second-cycle in every street.
+
+```shell
+./run_simulator.sh dummy [dataset].txt
+./run_submitter.sh dummy
+```
 
 | Input Data Set     | Score     |
 |--------------------|-----------|
@@ -19,6 +24,11 @@ Initial simple version with a one-second-cycle every streets.
 ### Optimized dummy solution
 
 This variant checks if at least one car drives through an street and only keeps those streets.
+
+```shell
+./run_simulator.sh optimize dummy [dataset].txt
+./run_submitter.sh optimize dummy
+```
 
 | Input Data Set     | Score     |
 |--------------------|-----------|

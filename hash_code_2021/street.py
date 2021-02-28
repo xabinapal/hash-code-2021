@@ -10,3 +10,5 @@ class Street:
     length: int
     start_intersection: Intersection
     end_intersection: Intersection
+
+    total_cars: int = 0

@@ -58,10 +58,11 @@ class City:
         car = Car(id, path)
         self.__cars.append(car)
 
-    def simplify(self):
-        streets = {street.id for car in self.__cars for street in car.path}
+        for street in car.path:
+            street.total_cars += 1
 
-        unused_streets = set(self.__streets.keys()).difference(streets)
+    def simplify(self):
+        unused_streets = {x.id for x in self.__streets.values() if x.total_cars == 0}
         for street_id in unused_streets:
             street = self.__streets[street_id]
             street.start_intersection.remove_exit(street)
