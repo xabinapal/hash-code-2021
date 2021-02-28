@@ -65,20 +65,18 @@ class SimulationIntersection:
         if self.current_light_time == -1:
             self.current_light = 0
             self.current_light_time = 0
-            self.traffic_lights[self.schedule[self.current_light][0]].set_open(True)
+            self.traffic_lights[self.schedule[self.current_light][0].id].set_open(True)
         elif len(self.schedule) > 1:
             self.current_light_time += 1
             if self.current_light_time == self.schedule[self.current_light][1]:
-                self.traffic_lights[self.schedule[self.current_light][0]].set_open(
+                self.traffic_lights[self.schedule[self.current_light][0].id].set_open(
                     False
                 )
 
                 self.current_light = (self.current_light + 1) % len(self.traffic_lights)
                 self.current_light_time = 0
 
-                self.traffic_lights[self.schedule[self.current_light][0]].set_open(
-                    True
-                )
+                self.traffic_lights[self.schedule[self.current_light][0].id].set_open(True)
 
 
 @dataclass(init=False)
@@ -111,16 +109,17 @@ class SimulationStreet:
 
     def set_open(self, state):
         logging.debug(
-            f"Set street's {self.id} traffic light to {'green' if state else 'red'}"
+            "Set street's %d traffic light to %s"
+            % (self.id, "green" if state else "red")
         )
         self.is_open = state
 
     def add_car(self, car, end_of_street=False):
         if end_of_street:
-            logging.debug(f"Adding car {car.id} to end of street {self.id}")
+            logging.debug("Adding car %d to end of street %d" % (car.id, self.id))
             self.cars_in_light.append(car)
         else:
-            logging.debug(f"Adding car {car.id} to start of street {self.id}")
+            logging.debug("Adding car %d to start of street %d" % (car.id, self.id))
             self.cars_in_transit.append((car, 0))
 
     def clear(self):
@@ -134,7 +133,8 @@ class SimulationStreet:
                 car = self.cars_in_light.popleft()
                 new_street = car.path.popleft()
                 logging.debug(
-                    f"Moving car {car.id} from street {self.id} to street {new_street}"
+                    "Moving car %d from street %d to street %d"
+                    % (car.id, self.id, new_street)
                 )
                 self.intersection.streets[new_street].add_car(car)
         except IndexError:
@@ -146,7 +146,8 @@ class SimulationStreet:
         new_cars_in_transit = deque()
         for car, position in self.cars_in_transit:
             logging.debug(
-                f"Advancing car {car.id} through street {self.id} to position {position + 1}"
+                "Advancing car %d through street %d to position %d"
+                % (car.id, self.id, position + 1)
             )
             if position == self.length - 1:
                 if len(car.path):
@@ -223,7 +224,7 @@ class Simulator:
         while tick < self.duration and remaining_cars > 0:
             tick += 1
 
-            logging.info(f"Tick: #{tick}")
+            logging.info("Tick: #%d" % (tick,))
 
             for intersection in intersections:
                 intersection.cycle_traffic_lights()
@@ -236,5 +237,5 @@ class Simulator:
                     score += self.bonus_score + self.duration - tick
                     remaining_cars -= 1
 
-        logging.info(f"Score: {score}")
+        logging.info("Score: %d" % (score,))
         return score
