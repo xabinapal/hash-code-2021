@@ -1,4 +1,4 @@
-from hash_code_2021 import City, DummyScheduler
+from hash_code_2021 import City, DummyScheduler, Simulator
 
 import sys
 
@@ -20,3 +20,7 @@ scheduler = DummyScheduler(city)
 
 if sys.argv[1] == "submit":
     scheduler.print()
+elif sys.argv[1] == "simulate":
+    simulator = Simulator(city, duration, bonus_score)
+    simulator.prepare()
+    simulator.execute(scheduler)
