@@ -1,6 +1,11 @@
+import os
+import logging
+import sys
+
 from hash_code_2021 import City, DummyScheduler, Simulator
 
-import sys
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "WARN").upper()
+logging.basicConfig(level=LOG_LEVEL)
 
 # Read input
 duration, num_intersections, num_streets, num_cars, bonus_score = (
@@ -23,4 +28,5 @@ if sys.argv[1] == "submit":
 elif sys.argv[1] == "simulate":
     simulator = Simulator(city, duration, bonus_score)
     simulator.prepare()
-    simulator.execute(scheduler)
+    score = simulator.execute(scheduler)
+    print(f"Score: {score}")

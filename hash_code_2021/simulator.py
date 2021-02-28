@@ -1,7 +1,7 @@
+import logging
+
 from collections import deque
 from dataclasses import dataclass
-
-from hash_code_2021 import Car, City
 
 
 @dataclass(init=False)
@@ -110,19 +110,32 @@ class SimulationStreet:
         self.is_open = False
 
     def set_open(self, state):
+        logging.debug(
+            f"Set street's {self.id} traffic light to {'green' if state else 'red'}"
+        )
         self.is_open = state
 
     def add_car(self, car, end_of_street=False):
         if end_of_street:
+            logging.debug(f"Adding car {car.id} to end of street {self.id}")
             self.cars_in_light.append(car)
         else:
+            logging.debug(f"Adding car {car.id} to start of street {self.id}")
             self.cars_in_transit.append((car, 0))
+
+    def clear(self):
+        self.cars_in_light.clear()
+        self.cars_in_transit.clear()
+        self.is_open = False
 
     def finish_cars(self):
         try:
             if self.is_open:
                 car = self.cars_in_light.popleft()
                 new_street = car.path.popleft()
+                logging.debug(
+                    f"Moving car {car.id} from street {self.id} to street {new_street}"
+                )
                 self.intersection.streets[new_street].add_car(car)
         except IndexError:
             # no cars to move, ignore
@@ -132,6 +145,9 @@ class SimulationStreet:
         has_finished = False
         new_cars_in_transit = deque()
         for car, position in self.cars_in_transit:
+            logging.debug(
+                f"Advancing car {car.id} through street {self.id} to position {position + 1}"
+            )
             if position == self.length - 1:
                 if len(car.path):
                     self.cars_in_light.append(car)
@@ -165,11 +181,6 @@ class Simulator:
             if sim_exit is not None:
                 sim_exit.add_exit(sim_street)
 
-        for car in self.city.get_all_cars():
-            sim_car = SimulationCar(car.id, car.path)
-            street = sim_car.path.popleft()
-            self.streets[street].add_car(sim_car, True)
-
     def __create_intersection(self, id):
         try:
             return self.intersections[id]
@@ -195,13 +206,24 @@ class Simulator:
         streets = self.streets.values()
 
         for id, intersection in self.intersections.items():
-            intersection.set_schedule(scheduler.get_intersection(id))
+            schedule = scheduler.get_intersection(id)
+            intersection.set_schedule(schedule)
 
-        tick = 1
+        for street in self.streets.values():
+            street.clear()
+
+        for car in self.city.get_all_cars():
+            sim_car = SimulationCar(car.id, car.path)
+            street = sim_car.path.popleft()
+            self.streets[street].add_car(sim_car, True)
+
+        tick = 0
         score = 0
         remaining_cars = self.city.get_car_count()
-        while tick <= self.duration and remaining_cars > 0:
-            print(f"Tick #{tick}")
+        while tick < self.duration and remaining_cars > 0:
+            tick += 1
+
+            logging.info(f"Tick: #{tick}")
 
             for intersection in intersections:
                 intersection.cycle_traffic_lights()
@@ -214,6 +236,5 @@ class Simulator:
                     score += self.bonus_score + self.duration - tick
                     remaining_cars -= 1
 
-            tick += 1
-
-        print(f"Final score: {score}")
+        logging.info(f"Score: {score}")
+        return score

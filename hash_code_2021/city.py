@@ -59,7 +59,7 @@ class City:
         self.__cars.append(car)
 
     def simplify(self):
-        streets = set([street.id for car in self.__cars for street in car.path])
+        streets = {street.id for car in self.__cars for street in car.path}
 
         unused_streets = set(self.__streets.keys()).difference(streets)
         for street_id in unused_streets:
@@ -71,7 +71,7 @@ class City:
         unused_intersections = [
             id
             for id, intersection in self.__intersections.items()
-            if not len(intersection.exits) or not len(intersection.entrances)
+            if len(intersection.exits) == 0 or len(intersection.entrances) == 0
         ]
         for intersection_id in unused_intersections:
             del self.__intersections[intersection_id]
