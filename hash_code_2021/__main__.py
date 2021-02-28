@@ -3,7 +3,8 @@ import os
 import logging
 import sys
 
-from hash_code_2021 import City, DummyScheduler, Simulator
+from hash_code_2021 import City, Simulator
+from hash_code_2021 import DummyScheduler, CongestionScheduler
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "WARN").upper()
 logging.basicConfig(level=LOG_LEVEL)
@@ -11,7 +12,7 @@ logging.basicConfig(level=LOG_LEVEL)
 parser = argparse.ArgumentParser()
 parser.add_argument("action", type=str, choices=["submit", "simulate"])
 parser.add_argument("--optimize", action=argparse.BooleanOptionalAction)
-parser.add_argument("--scheduler", type=str, choices=["dummy"])
+parser.add_argument("--scheduler", type=str, choices=["dummy", "congestion"])
 
 arguments = parser.parse_args()
 
@@ -33,6 +34,8 @@ if arguments.optimize:
 scheduler = None
 if arguments.scheduler == "dummy":
     scheduler = DummyScheduler(city)
+elif arguments.scheduler == "congestion":
+    scheduler = CongestionScheduler(city, int(os.environ.get("CONGESTION_FACTOR", "1")))
 
 if arguments.action == "submit":
     scheduler.print()

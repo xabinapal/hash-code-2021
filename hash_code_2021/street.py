@@ -12,3 +12,4 @@ class Street:
     end_intersection: Intersection
 
     total_cars: int = 0
+    starting_cars: int = 0

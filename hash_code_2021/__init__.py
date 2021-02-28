@@ -5,4 +5,4 @@ from .car import Car
 from .city import City
 
 from .simulator import Simulator
-from .scheduler import DummyScheduler
+from .scheduler import DummyScheduler, CongestionScheduler

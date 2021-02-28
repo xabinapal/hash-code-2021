@@ -1,3 +1,6 @@
+import math
+
+
 class Scheduler:
     def __init__(self):
         self._intersections = dict()
@@ -21,6 +24,27 @@ class DummyScheduler(Scheduler):
         for intersection in city.get_all_intersections():
             schedule = []
             for entrance in intersection.entrances.values():
-                schedule.append((entrance, 1))
+                time = 1
+                schedule.append((entrance, time))
 
             self._intersections[intersection.id] = tuple(schedule)
+
+
+class CongestionScheduler(Scheduler):
+    def __init__(self, city, factor):
+        super().__init__()
+
+        for intersection in city.get_all_intersections():
+            schedule = []
+            total_cars = sum(
+                street.total_cars for street in intersection.entrances.values()
+            )
+            for entrance in intersection.entrances.values():
+                time = math.ceil(
+                    len(intersection.entrances) * (entrance.total_cars / total_cars) / factor
+                )
+                schedule.append((entrance, time))
+
+            self._intersections[intersection.id] = tuple(
+                sorted(schedule, key=lambda x: x[0].starting_cars, reverse=True)
+            )

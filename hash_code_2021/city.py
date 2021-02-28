@@ -58,6 +58,8 @@ class City:
         car = Car(id, path)
         self.__cars.append(car)
 
+        car.path[0].starting_cars += 1
+
         for street in car.path:
             street.total_cars += 1
 
